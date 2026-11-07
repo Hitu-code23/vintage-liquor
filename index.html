@@ -94,13 +94,31 @@ svg{display:block}
 .pre-drip svg{width:100%;height:100%}
 .pre-in{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:var(--g)}
 .pre-top,.pre-bot{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
-.pre-count{font-family:var(--hd);font-weight:300;font-size:clamp(90px,22vw,340px);line-height:.8;letter-spacing:-.04em;overflow:hidden}
-.pre-count span{display:inline-block}
+.glass-wrap{position:relative;width:clamp(120px,15vw,200px);margin:0 auto 34px;z-index:2}
+.glass-wrap svg.glass{position:relative;z-index:1;width:100%;height:auto;display:block;overflow:visible}
+.stream{position:absolute;left:44%;width:clamp(7px,.8vw,10px);bottom:22%;height:140vh;z-index:0;border-radius:6px;transform-origin:50% 100%;transform:scaleY(0);
+  background:linear-gradient(90deg,#8a3a10,#e9a24e 40%,#f6c983 55%,#b0601f);box-shadow:0 0 18px rgba(233,162,78,.35)}
+.stream::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(255,240,210,.35) 0 6px,transparent 6px 22px);animation:flow .5s linear infinite;border-radius:inherit}
+@keyframes flow{to{background-position:0 22px}}
+.pour-pct{display:flex;justify-content:center;gap:14px;align-items:baseline;color:var(--cream)}
+.pour-pct b{font-family:var(--hd);font-weight:300;font-size:clamp(34px,4.6vw,58px);letter-spacing:-.03em;line-height:1;min-width:3.2ch;text-align:right}
+.pour-pct span{font-size:10.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+.glass-wrap .pour-pct{position:absolute;left:50%;top:calc(100% + 18px);transform:translateX(-50%);white-space:nowrap}
+.wave-move{animation:wave 2.4s linear infinite}
+@keyframes wave{to{transform:translateX(-80px)}}
+.bub{animation:bub 2.6s ease-in infinite;opacity:0}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:.8}100%{transform:translateY(-70px);opacity:0}}
+.flood{position:absolute;inset:0;z-index:5;transform:translateY(112%);background:linear-gradient(180deg,#d9923f 0%,#b4621f 45%,#7a3410 100%);pointer-events:none}
+.flood .crest{position:absolute;left:0;right:0;top:-46px;height:48px;overflow:hidden}
+.flood .crest svg{width:200%;height:100%;animation:wave2 1.6s linear infinite}
+@keyframes wave2{to{transform:translateX(-50%)}}
+.flood .shine{position:absolute;inset:0;background:radial-gradient(60% 40% at 30% 20%,rgba(255,230,180,.35),transparent 70%)}
 .pre-bar{position:absolute;left:var(--g);right:var(--g);bottom:calc(var(--g) + 30px);height:1px;background:rgba(255,249,235,.2)}
 .pre-bar i{position:absolute;inset:0;background:var(--cream);transform-origin:left;transform:scaleX(0)}
-.gate{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:var(--g);pointer-events:none}
+.gate{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:var(--g);pointer-events:none;overflow:hidden}
 .gate-in{max-width:760px}
-.gate h1{font-size:clamp(34px,6.4vw,92px);color:var(--cream)}
+.gate h1{font-size:clamp(30px,5vw,76px);color:var(--cream)}
+.gate-in{position:relative}
 .gate p{margin:22px auto 36px;color:rgba(255,249,235,.7);max-width:380px}
 .gate-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;pointer-events:auto}
 .gate .no-msg{display:none}
@@ -550,17 +568,41 @@ form.sent + .ok{display:block}
 <!-- ============ PRELOADER + AGE GATE ============ -->
 <div class="pre" id="pre" role="dialog" aria-modal="true" aria-labelledby="gateQ">
   <div class="pre-panel" id="prePanel">
-    <div class="pre-drip" data-drip="#5D0D18"></div>
+    <div class="pre-drip" data-drip="#7A3410"></div>
+    <div class="flood" id="flood"><div class="crest"><svg viewBox="0 0 1600 48" preserveAspectRatio="none"><path d="M0 30 Q100 6 200 30 T400 30 T600 30 T800 30 T1000 30 T1200 30 T1400 30 T1600 30 V48 H0 Z" fill="#d9923f"/></svg></div><div class="shine"></div></div>
     <div class="pre-in" id="preIn">
       <div class="pre-top lbl"><span>Vintage Liquor®</span><span>Flint, Michigan</span></div>
-      <div class="pre-bot">
-        <div class="pre-count"><span id="preNum">000</span></div>
-        <div class="lbl" style="align-self:flex-end;text-align:right">Pouring<br>the cellar</div>
-      </div>
+      <div class="pre-bot"><span class="lbl">21+ only</span><span class="lbl">Please drink responsibly</span></div>
       <div class="pre-bar"><i id="preBar"></i></div>
     </div>
     <div class="gate" id="gate">
       <div class="gate-in">
+        <div class="glass-wrap" id="glassWrap">
+          <span class="stream" id="stream"></span>
+          <svg class="glass" id="glassSvg" viewBox="0 0 200 210" aria-hidden="true">
+            <defs>
+              <clipPath id="gClip"><path d="M37 26 L163 26 L154 186 Q153 192 147 192 L53 192 Q47 192 46 186 Z"/></clipPath>
+              <linearGradient id="gLiq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0ac55"/><stop offset=".5" stop-color="#c2722a"/><stop offset="1" stop-color="#7a3410"/></linearGradient>
+              <linearGradient id="gGlass" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".18" stop-color="#fff" stop-opacity=".04"/><stop offset=".8" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#fff" stop-opacity=".16"/></linearGradient>
+            </defs>
+            <ellipse cx="100" cy="206" rx="70" ry="4" fill="#000" opacity=".35"/>
+            <g clip-path="url(#gClip)">
+              <g id="liq" transform="translate(0 196)">
+                <rect x="0" y="6" width="200" height="200" fill="url(#gLiq)"/>
+                <g class="wave-move"><path d="M0 8 Q20 0 40 8 T80 8 T120 8 T160 8 T200 8 T240 8 T280 8 V18 H0 Z" fill="#f6c983" opacity=".9"/></g>
+                <circle class="bub" cx="70" cy="80" r="2.4" fill="#ffe3b0" style="animation-delay:-.3s"/><circle class="bub" cx="118" cy="110" r="1.8" fill="#ffe3b0" style="animation-delay:-1.2s"/><circle class="bub" cx="96" cy="140" r="2" fill="#ffe3b0" style="animation-delay:-2s"/>
+              </g>
+              <g id="ice" transform="translate(0 196)">
+                <rect x="62" y="-6" width="38" height="36" rx="7" transform="rotate(-12 81 12)" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-opacity=".55"/>
+                <rect x="104" y="-2" width="34" height="32" rx="7" transform="rotate(14 121 14)" fill="#fff" fill-opacity=".16" stroke="#fff" stroke-opacity=".5"/>
+              </g>
+            </g>
+            <path d="M30 20 L170 20 L160 196 Q159 204 150 204 L50 204 Q41 204 40 196 Z" fill="url(#gGlass)" stroke="#FFF9EB" stroke-opacity=".8" stroke-width="2.4" stroke-linejoin="round"/>
+            <path d="M40 186 L160 186" stroke="#FFF9EB" stroke-opacity=".35" stroke-width="1.4"/>
+            <path d="M44 30 L52 176" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <div class="pour-pct" id="pourPct"><b id="pourN">0</b><span>% · Pouring</span></div>
+        </div>
         <div class="yes-msg">
           <h1 class="hd q" id="gateQ"><span class="line"><span>Are you</span></span><span class="line"><span>21 or older?</span></span></h1>
           <p class="q">You must be of legal drinking age to enter Vintage Liquor.</p>
@@ -1172,11 +1214,17 @@ $("#wordmark").innerHTML = [..."VINTAGE"].map(c => `<span>${c}</span>`).join("")
 const pre = $("#pre"), gate = $("#gate");
 function enterSite() {
   document.body.classList.remove("lock");
+  try { localStorage.setItem("vl21", "1"); } catch (e) {}
   if (!HAS) { pre.remove(); return; }
+  gsap.killTweensOf("#ice");
+  const lv = { y: 70 };
   const tl = gsap.timeline({ onComplete: () => pre.remove() });
-  tl.to("#gate .yes-msg", { opacity: 0, y: -30, duration: .5, ease: "power3.in" })
-    .to("#prePanel", { yPercent: -125, duration: 1.4, ease: "expo.inOut" }, "-=.1")
-    .from(".hero-type .ch", { yPercent: 115, duration: 1.3, stagger: .028, ease: "expo.out" }, "-=.65")
+  tl.to("#gate .yes-msg", { opacity: 0, y: 30, duration: .45, ease: "power3.in" })
+    .to("#glassSvg", { rotation: 118, transformOrigin: "88% 92%", duration: .8, ease: "power2.inOut" }, "-=.15")
+    .to(lv, { y: 230, duration: .7, ease: "power2.in", onUpdate: () => { $("#liq").setAttribute("transform", `translate(0 ${lv.y})`); $("#ice").setAttribute("transform", `translate(0 ${lv.y})`); } }, "<.25")
+    .to("#flood", { y: 0, duration: 1, ease: "expo.inOut" }, "<.1")
+    .to("#prePanel", { yPercent: -125, duration: 1.3, ease: "expo.inOut" }, "-=.15")
+    .from(".hero-type .ch", { yPercent: 115, duration: 1.3, stagger: .028, ease: "expo.out" }, "-=.6")
     .fromTo(".blob svg", { scale: .3, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 1.6, ease: "expo.out" }, "<")
     .from(".hero-bot>*, .hero-meta span, .nav>*", { y: 30, opacity: 0, duration: 1, stagger: .06, ease: "expo.out" }, "<.2");
   tl.fromTo(".hb-in", { yPercent: -55, rotation: -12, scale: .82, opacity: 0 }, { yPercent: 0, rotation: 0, scale: 1, opacity: 1, duration: 1.9, ease: "expo.out" }, "<-.3");
@@ -1186,18 +1234,32 @@ $("#gYes").addEventListener("click", enterSite);
 $("#gNo").addEventListener("click", () => gate.classList.add("denied"));
 $("#gBack").addEventListener("click", () => gate.classList.remove("denied"));
 
+let returning = false; try { returning = localStorage.getItem("vl21") === "1"; } catch (e) {}
 function preloader() {
-  if (!HAS) { $("#preIn").style.display = "none"; $$(".gate .q").forEach(q => q.style.opacity = 1); return; }
-  const o = { v: 0 };
+  if (!HAS) { $("#preIn").style.display = "none"; $("#pourPct").style.display = "none"; $$(".gate .q").forEach(q => q.style.opacity = 1); gsap && gsap.set && 0; $("#liq").setAttribute("transform", "translate(0 70)"); $("#ice").setAttribute("transform", "translate(0 70)"); return; }
+  const T = REDUCED ? .4 : returning ? 1.2 : 2.4;
+  const lv = { y: 196, p: 0 };
+  const lift = () => $(".gate .yes-msg").offsetHeight / 2 + 30;
+  gsap.set("#glassWrap", { y: lift });
   const tl = gsap.timeline();
-  tl.to(o, { v: 100, duration: REDUCED ? .2 : 2.1, ease: "power2.inOut", onUpdate: () => { $("#preNum").textContent = String(Math.round(o.v)).padStart(3, "0"); } })
-    .to("#preBar", { scaleX: 1, duration: REDUCED ? .2 : 2.1, ease: "power2.inOut" }, 0)
-    .to("#preNum", { yPercent: -110, duration: .8, ease: "expo.in" })
-    .to(".pre-top, .pre-bot .lbl, .pre-bar", { opacity: 0, duration: .4 }, "<")
-    .set(".gate .q", { opacity: 1 })
-    .from(".gate .line>span", { yPercent: 110, duration: 1.1, stagger: .08, ease: "expo.out" })
+  tl.from("#glassSvg", { y: 40, opacity: 0, duration: .8, ease: "expo.out" })
+    .to("#stream", { scaleY: 1, duration: .45, ease: "power2.in" }, "-=.3")
+    .to(lv, { y: 70, p: 100, duration: T, ease: "power1.inOut", onUpdate: () => {
+        $("#liq").setAttribute("transform", `translate(0 ${lv.y})`);
+        $("#ice").setAttribute("transform", `translate(0 ${Math.max(lv.y, 120) - 8 + Math.sin(lv.p / 6) * 3})`);
+        $("#pourN").textContent = Math.round(lv.p);
+      } })
+    .to("#preBar", { scaleX: 1, duration: T, ease: "power1.inOut" }, "<")
+    .to("#stream", { scaleY: 0, transformOrigin: "50% 0%", duration: .4, ease: "power2.in" }, "-=.15")
+    .to("#pourPct", { opacity: 0, duration: .4 }, "<")
+    .to(".pre-bar", { opacity: 0, duration: .4 }, "<")
+    .to("#glassWrap", { y: 0, duration: 1.1, ease: "expo.inOut" }, "-=.1")
+    .set(".gate .q", { opacity: 1 }, "-=.55")
+    .from(".gate .line>span", { yPercent: 110, duration: 1.1, stagger: .08, ease: "expo.out" }, "-=.55")
     .fromTo(".gate p.q, .gate .gate-btns", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .9, stagger: .1, ease: "expo.out" }, "<.3")
     .add(() => $("#gYes").focus());
+  // ice keeps bobbing once full
+  gsap.to("#ice", { attr: { transform: "translate(0 66)" }, duration: 1.6, yoyo: true, repeat: -1, ease: "sine.inOut", delay: T + 1.4 });
 }
 preloader();
 
@@ -1220,8 +1282,9 @@ function startMotion() {
   // hero scroll choreography
   const mm = gsap.matchMedia();
   mm.add("all", () => {
-    gsap.to(".hero-type .hd>.line:first-child", { xPercent: -14, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
-    gsap.to(".hero-type .hd>.line:last-child", { xPercent: 14, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
+    const hx = FINE ? 14 : 6;
+    gsap.to(".hero-type .hd>.line:first-child", { xPercent: -hx, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: .8 } });
+    gsap.to(".hero-type .hd>.line:last-child", { xPercent: hx, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: .8 } });
   });
   gsap.to(".blob-s", { scale: 1.35, rotate: 40, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
   gsap.to(".hb-scroll", { yPercent: 22, rotation: 6, scale: .84, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true, onUpdate: st => $("#bottle3d").style.setProperty("--sf", Math.min(1, st.progress * 2.5).toFixed(3)) } });
@@ -1238,10 +1301,12 @@ function startMotion() {
 
   // marquee driven by time + scroll velocity
   const rows = [["#mq1", -1], ["#mq2", 1]].map(([s, d]) => { const el = $(s); el.innerHTML += el.innerHTML + el.innerHTML; return { el, d, x: 0, w: el.scrollWidth / 3 }; });
-  let vel = 0;
-  gsap.ticker.add(() => {
-    const v = lenis ? lenis.velocity : 0; vel += (v - vel) * .1;
-    rows.forEach(r => { r.x += (1.1 + Math.abs(vel) * .35) * r.d * (vel < -0.5 ? -1 : 1); if (r.x <= -r.w) r.x += r.w; if (r.x > 0) r.x -= r.w; r.el.style.transform = `translate3d(${r.x}px,0,0) skewX(${Math.max(-8, Math.min(8, -vel * .4))}deg)`; });
+  let vel = 0, lastSY = scrollY;
+  const BASE = FINE ? 1.1 : .55, BOOST = FINE ? .22 : .06, SKEW = FINE ? 7 : 3;
+  gsap.ticker.add((t, dt) => {
+    const sy = scrollY, raw = Math.max(-14, Math.min(14, (sy - lastSY) * (16.7 / Math.max(dt, 1)))); lastSY = sy;
+    vel += (raw - vel) * (FINE ? .1 : .06);
+    rows.forEach(r => { r.x += (BASE + Math.abs(vel) * BOOST) * r.d * (FINE && vel < -0.5 ? -1 : 1); if (r.x <= -r.w) r.x += r.w; if (r.x > 0) r.x -= r.w; r.el.style.transform = `translate3d(${r.x}px,0,0) skewX(${Math.max(-SKEW, Math.min(SKEW, -vel * .35))}deg)`; });
   });
   addEventListener("resize", () => rows.forEach(r => r.w = r.el.scrollWidth / 3));
 
